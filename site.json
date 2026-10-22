@@ -1,0 +1,13 @@
+{
+  "name": "GitgitDev",
+  "tagline": "Game dan aplikasi Android buatan Indonesia",
+  "intro": "GitgitDev adalah studio indie milik Sigit Jatmiko. Kami membuat game dan aplikasi Android yang ringan, rapi, dan menyenangkan dimainkan.",
+  "developer": "Sigit Jatmiko",
+  "base_url": "https://gitgitdev.my.id",
+  "contact_email": "sjatmiko30@gmail.com",
+  "app_ads_txt": [
+    "google.com, pub-6808667639334235, DIRECT, f08c47fec0942fa0"
+  ],
+  "accent": "#7c5cff",
+  "accent_2": "#ff78b0"
+}

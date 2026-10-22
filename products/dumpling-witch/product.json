@@ -1,0 +1,46 @@
+{
+  "name": "Dumpling Witch",
+  "kind": "game",
+  "order": 1,
+  "status": "coming_soon",
+  "package": "com.gitgitmiko.dumplingwitch",
+  "play_url": "",
+  "tagline": "Penyihir chibi vs ribuan slime! Tembus 100 lantai dan kalahkan 10 boss dumpling.",
+  "genre": "Action roguelite 3D",
+  "platform": "Android 7.1+ (ARM64)",
+  "accent": "#7c5cff",
+  "accent_2": "#ff78b0",
+  "description": [
+    "Jadilah penyihir chibi bertopi raksasa dan hancurkan gelombang slime di arena 3D yang terus berubah. Setiap lantai butuh lebih banyak slime untuk dikalahkan, dan setiap 10 lantai boss jelly dumpling raksasa menunggu."
+  ],
+  "features": [
+    ["100 lantai", "Masuk portal untuk naik lantai; cuaca dan siang/malam berganti, bioma berganti tiap 10 lantai."],
+    ["10 boss dumpling", "Di bawah 30% HP boss mengamuk (ENRAGE) dengan skill elemen. Lantai 100: Royal Dumpling pelangi."],
+    ["Skill sihir", "Cincin Es, Nova Api, Petir Berantai, dan Misil Arkana, naik sampai Lv 10."],
+    ["Kartu upgrade", "Pilih 1 dari 3 setiap naik level: damage, critical, lifesteal, pertahanan, dan lainnya."],
+    ["Item & inventori", "Staff, topi, baju, celana, sepatu dengan rarity Normal, Rare, Legend, Ultra."],
+    ["3 nyawa", "Nyawa habis? Lanjutkan perjalanan atau mulai petualangan baru."],
+    ["Kontrol satu jari", "Joystick, dash, dan geser layar untuk memutar kamera."],
+    ["Offline", "Main tanpa akun dan tanpa internet (iklan opsional butuh internet)."]
+  ],
+  "screenshots": [
+    ["01.webp", "Menu utama dengan trofi boss"],
+    ["02.webp", "Boss mengamuk (ENRAGE)"],
+    ["03.webp", "Nova Api melawan gerombolan slime"],
+    ["04.webp", "Pilih kartu upgrade setiap naik level"],
+    ["05.webp", "Bar HP boss dumpling"],
+    ["06.webp", "Inventori item Normal sampai Ultra"],
+    ["07.webp", "Cincin Es mengelilingi penyihir"],
+    ["08.webp", "Arena berubah sesuai lantai terjauh"]
+  ],
+  "privacy": {
+    "effective": "22 Oktober 2026",
+    "account": false,
+    "local_save": "Progres permainan (emas, upgrade, pengaturan, dan run yang sedang berjalan)",
+    "local_save_en": "Game progress (gold, upgrades, settings and the current run)",
+    "ads_admob": true,
+    "ads_moment": "saat pemain memilih <em>Lanjutkan</em> setelah nyawa habis",
+    "ads_moment_en": "when the player chooses <em>Continue</em> after running out of lives",
+    "min_age": 13
+  }
+}
