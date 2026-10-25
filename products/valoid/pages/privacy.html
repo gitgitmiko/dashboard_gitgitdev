@@ -1,70 +1,79 @@
 <!-- title: Kebijakan Privasi -->
-<h1>Kebijakan Privasi Valoid</h1>
+<h1>Kebijakan Privasi Valoid Hub</h1>
 <p>Berlaku sejak 25 Oktober 2026. Pengembang: GitgitDev. Kontak: <a href="mailto:{{contact_email}}">{{contact_email}}</a>.</p>
-<p>Valoid (<code>com.valoid.mobile</code>) adalah aplikasi pendamping VALORANT pihak ketiga. Valoid tidak didukung atau disponsori oleh Riot Games, dan tidak mencerminkan pandangan Riot Games atau siapa pun yang terlibat dalam produksi atau pengelolaan properti Riot Games.</p>
+<p>Valoid Hub (<code>com.valoid.mobile</code>) adalah aplikasi pendamping VALORANT pihak ketiga untuk mencari party. Valoid Hub tidak didukung atau disponsori oleh Riot Games, dan tidak mencerminkan pandangan Riot Games atau siapa pun yang terlibat dalam produksi atau pengelolaan properti Riot Games.</p>
 
-<h2>Akun Valoid</h2>
-<p>Untuk memakai Valoid Anda masuk dengan Google atau email dan kata sandi melalui Firebase Authentication (Google). Kami menerima alamat email, nama tampilan, dan ID pengguna Firebase Anda. Kata sandi dikelola Firebase dan tidak pernah kami lihat.</p>
+<h2>Akun Valoid Hub</h2>
+<p>Kamu masuk dengan Google atau email dan kata sandi melalui Firebase Authentication (Google). Kami menerima alamat email, nama tampilan, dan ID pengguna Firebase. Kata sandi dikelola Firebase dan tidak pernah kami lihat.</p>
 
 <h2>Akun Riot</h2>
-<p>Akun Riot dihubungkan melalui halaman login resmi Riot (<code>auth.riotgames.com</code>) di dalam aplikasi. Valoid tidak melihat atau menyimpan kata sandi Riot Anda.</p>
+<p>Akun Riot dihubungkan melalui halaman login resmi Riot (<code>auth.riotgames.com</code>) di dalam aplikasi. Valoid Hub tidak melihat atau menyimpan kata sandi Riot.</p>
 <ul>
-<li>Cookie sesi Riot disimpan terenkripsi (Android Keystore) hanya di perangkat Anda, agar Anda tetap masuk. Cookie ini tidak dikirim ke server kami.</li>
-<li>Token akses Riot hanya disimpan di memori selama aplikasi berjalan.</li>
-<li>Dengan token tersebut aplikasi langsung meminta data dari server Riot (toko, dompet, profil, rank, riwayat match, kontrak, loadout, dan koleksi) untuk ditampilkan kepada Anda.</li>
+<li>Cookie sesi Riot disimpan terenkripsi (Android Keystore) hanya di perangkatmu dan tidak dikirim ke server kami.</li>
+<li>Token akses Riot hanya disimpan di memori selama aplikasi berjalan, dan dipakai untuk meminta data langsung dari server Riot (toko, dompet, profil, rank, riwayat match, kontrak, loadout, koleksi).</li>
 </ul>
 
-<h2>Data yang disimpan di server</h2>
-<p>Data berikut disimpan di Cloud Firestore (Google Firebase, wilayah Jakarta) di bawah akun Valoid Anda dan hanya bisa dibaca oleh Anda:</p>
+<h2>Chat dan cari party</h2>
+<p>Room chat membutuhkan akun Riot yang terhubung. Saat kamu mengirim pesan:</p>
 <ul>
-<li><strong>Favorit skin</strong>: ID, nama, dan gambar skin yang Anda tandai.</li>
-<li><strong>Riwayat toko</strong>: tanggal dan daftar penawaran toko harian (ID, nama, gambar, harga skin), dikelompokkan per ID akun Riot (PUUID) yang Anda hubungkan.</li>
+<li><strong>Profil chat</strong> berisi Riot ID (nama#tag), rank, ikon rank, wilayah server, dan gambar kartu pemainmu. Profil ini disimpan di server dan <strong>terlihat oleh semua pengguna yang masuk</strong>, karena dipakai untuk saling invite di game.</li>
+<li><strong>Pesan</strong> (teks, kartu Cari party, dan waktu kirim) disimpan di server dan terlihat oleh pengguna lain di room tersebut.</li>
+<li><strong>Status online</strong>: selama aplikasi terbuka, ID pengguna dan waktu tersambung dicatat di Firebase Realtime Database (Singapura) untuk menghitung jumlah pengguna online. Catatan ini otomatis dihapus saat aplikasi ditutup atau koneksi terputus.</li>
+<li><strong>Laporan</strong> yang kamu kirim (pesan yang dilaporkan, alasan, keterangan, dan ID pelapor) hanya dapat dibaca admin untuk moderasi.</li>
+<li><strong>Daftar blokir</strong> disimpan di akunmu dan hanya kamu yang dapat membacanya.</li>
+<li>Admin dapat menghapus pesan dan memblokir pengguna dari chat sesuai <a href="/valoid/aturan-komunitas/">aturan komunitas</a>.</li>
 </ul>
-<p>Kami tidak menjual data Anda dan tidak membagikannya kepada pihak lain selain penyedia layanan yang disebut di kebijakan ini.</p>
+
+<h2>Data lain yang disimpan di server</h2>
+<p>Cloud Firestore (Google Firebase, wilayah Jakarta) juga menyimpan, hanya untuk akunmu:</p>
+<ul>
+<li><strong>Favorit skin</strong>: ID, nama, dan gambar skin yang kamu tandai.</li>
+<li><strong>Riwayat toko</strong>: tanggal dan daftar penawaran toko harian, dikelompokkan per ID akun Riot (PUUID).</li>
+</ul>
+<p>Kami tidak menjual data dan tidak membagikannya kepada pihak lain selain penyedia layanan yang disebut di kebijakan ini.</p>
 
 <h2>Data di perangkat</h2>
-<p>Pengaturan aplikasi, status kunci aplikasi (PIN/biometrik diproses oleh Android dan tidak dikirim ke kami), cache gambar dan data skin, serta daftar akun Riot yang terhubung disimpan di perangkat dan terhapus jika aplikasi dihapus.</p>
+<p>Pengaturan, persetujuan aturan komunitas, status kunci aplikasi (PIN/biometrik diproses oleh Android dan tidak dikirim ke kami), cache gambar dan data skin, serta daftar akun Riot yang terhubung disimpan di perangkat dan terhapus jika aplikasi dihapus.</p>
 
 <h2>Layanan pihak ketiga</h2>
 <ul>
 <li><strong>Riot Games</strong>: login dan data game, sesuai <a href="https://www.riotgames.com/en/privacy-notice">Pemberitahuan Privasi Riot</a>.</li>
-<li><strong>Google Firebase</strong>: autentikasi dan penyimpanan data, sesuai <a href="https://firebase.google.com/support/privacy">privasi Firebase</a>.</li>
-<li><strong>valorant-api.com</strong>: nama, gambar, dan video konten game publik. Permintaan ini tidak berisi data akun Anda.</li>
-<li><strong>Google Play Billing</strong>: langganan Valoid Pro. Pembayaran diproses oleh Google; kami hanya menerima status langganan, bukan data kartu Anda.</li>
+<li><strong>Google Firebase</strong> (Authentication, Cloud Firestore, Realtime Database): akun, chat, dan penyimpanan data, sesuai <a href="https://firebase.google.com/support/privacy">privasi Firebase</a>.</li>
+<li><strong>valorant-api.com</strong>: nama, gambar, dan video konten game publik, tanpa data akunmu.</li>
+<li><strong>Google Play Billing</strong>: langganan Valoid Pro; pembayaran diproses Google, kami hanya menerima status langganan.</li>
 <li><strong>Google AdMob</strong>: lihat bagian Iklan.</li>
 </ul>
 
 <h2>Iklan</h2>
-<p>Pengguna gratis menonton iklan berhadiah dari Google AdMob untuk membuka toko harian. Google dapat mengumpulkan dan memproses data seperti ID iklan perangkat, alamat IP, informasi perangkat, dan interaksi dengan iklan untuk menampilkan iklan, mengukur performa, dan mencegah penipuan, sesuai <a href="https://policies.google.com/privacy">Kebijakan Privasi Google</a> dan <a href="https://policies.google.com/technologies/partner-sites">cara Google memakai data dari aplikasi mitra</a>. Anda dapat mereset atau menghapus ID iklan, atau memilih tidak menerima iklan yang dipersonalisasi, melalui Setelan &gt; Privasi &gt; Iklan di perangkat Android. Pengguna di wilayah yang mewajibkannya (misalnya EEA dan Inggris) diminta persetujuan sebelum iklan yang dipersonalisasi ditampilkan. Pelanggan Valoid Pro tidak melihat iklan.</p>
+<p>Pengguna gratis menonton iklan berhadiah dari Google AdMob untuk membuka toko harian. Google dapat mengumpulkan dan memproses data seperti ID iklan perangkat, alamat IP, informasi perangkat, dan interaksi dengan iklan untuk menampilkan iklan, mengukur performa, dan mencegah penipuan, sesuai <a href="https://policies.google.com/privacy">Kebijakan Privasi Google</a> dan <a href="https://policies.google.com/technologies/partner-sites">cara Google memakai data dari aplikasi mitra</a>. Kamu dapat mereset atau menghapus ID iklan, atau memilih tidak menerima iklan yang dipersonalisasi, melalui Setelan &gt; Privasi &gt; Iklan di perangkat Android. Pengguna di wilayah yang mewajibkannya (misalnya EEA dan Inggris) diminta persetujuan sebelum iklan yang dipersonalisasi ditampilkan. Pelanggan Valoid Pro tidak melihat iklan.</p>
 
 <h2>Notifikasi</h2>
-<p>Jika Anda mengizinkan notifikasi, Valoid memeriksa toko Anda secara berkala di perangkat dan memberi tahu saat skin favorit muncul. Pemeriksaan ini berjalan di perangkat Anda.</p>
+<p>Jika kamu mengizinkan notifikasi, Valoid Hub memeriksa tokomu secara berkala di perangkat dan memberi tahu saat skin favorit muncul.</p>
 
 <h2>Keamanan</h2>
-<p>Semua koneksi memakai HTTPS. Aturan keamanan Firestore membatasi data Anda hanya untuk akun Anda.</p>
+<p>Semua koneksi memakai HTTPS. Aturan keamanan Firebase membatasi siapa yang dapat membaca dan menulis setiap data, termasuk membatasi kecepatan kirim pesan dan mencegah pengguna mengirim atas nama orang lain.</p>
 
 <h2>Penyimpanan dan penghapusan</h2>
-<p>Data disimpan selama akun Valoid Anda aktif. Anda dapat menghapus akun dan semua datanya kapan saja dari aplikasi (Pengaturan &gt; Hapus akun) atau melalui <a href="/valoid/hapus-akun/">halaman penghapusan akun</a>. Memutus akun Riot di aplikasi menghapus cookie sesinya dari perangkat. Anda juga dapat mencabut akses aplikasi pihak ketiga dari akun Riot Anda di situs Riot.</p>
+<p>Pesan chat disimpan sampai kamu atau admin menghapusnya, atau sampai akunmu dihapus. Data lain disimpan selama akunmu aktif. Kamu dapat menghapus pesanmu sendiri (tekan lama pesan &gt; Hapus pesan), dan menghapus akun beserta semua datanya kapan saja dari aplikasi (Pengaturan &gt; Hapus akun) atau melalui <a href="/valoid/hapus-akun/">halaman penghapusan akun</a>. Laporan yang sedang ditinjau dapat disimpan hingga selesai ditindaklanjuti.</p>
 
 <h2>Anak-anak</h2>
-<p>Valoid ditujukan untuk pengguna berusia 13 tahun ke atas. Kami tidak dengan sengaja mengumpulkan data pribadi anak-anak.</p>
+<p>Valoid Hub ditujukan untuk pengguna berusia 13 tahun ke atas. Kami tidak dengan sengaja mengumpulkan data pribadi anak-anak.</p>
 
 <h2>Perubahan</h2>
 <p>Kebijakan ini dapat diperbarui. Versi terbaru selalu tersedia di halaman ini.</p>
 
 <div class="en">
-<h1>Valoid Privacy Policy (English)</h1>
+<h1>Valoid Hub Privacy Policy (English)</h1>
 <p>Effective 25 October 2026. Developer: GitgitDev. Contact: <a href="mailto:{{contact_email}}">{{contact_email}}</a>.</p>
-<p>Valoid (<code>com.valoid.mobile</code>) is a third-party VALORANT companion app. Valoid isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.</p>
-<p><strong>Valoid account.</strong> You sign in with Google or email and password through Firebase Authentication (Google). We receive your email address, display name and Firebase user ID. Passwords are handled by Firebase and never seen by us.</p>
-<p><strong>Riot account.</strong> You connect a Riot account through Riot's official sign-in page (<code>auth.riotgames.com</code>) inside the app; Valoid never sees or stores your Riot password. Riot session cookies are stored encrypted (Android Keystore) on your device only and are not sent to our servers. Riot access tokens are kept in memory while the app runs and are used to request your store, wallet, profile, rank, match history, contracts, loadout and collection directly from Riot's servers.</p>
-<p><strong>Data stored on our servers.</strong> Cloud Firestore (Google Firebase, Jakarta region) stores, under your Valoid account and readable only by you, your favourite skins (skin ID, name and image) and your store history (date and daily offers with skin ID, name, image and price, grouped by the Riot account ID (PUUID) you connected). We do not sell your data or share it with anyone other than the service providers named here.</p>
-<p><strong>Data on your device.</strong> Settings, app-lock state (PIN/biometrics are handled by Android and never sent to us), image and skin-data caches, and the list of connected Riot accounts stay on your device and are removed when the app is uninstalled.</p>
-<p><strong>Third-party services.</strong> Riot Games (sign-in and game data, <a href="https://www.riotgames.com/en/privacy-notice">Riot Privacy Notice</a>); Google Firebase (authentication and storage, <a href="https://firebase.google.com/support/privacy">Firebase privacy</a>); valorant-api.com (public game content, without your account data); Google Play Billing (Valoid Pro subscriptions, processed by Google; we only receive subscription status, never card details); Google AdMob (see Ads).</p>
-<p><strong>Ads.</strong> Free users watch a rewarded Google AdMob ad to open the daily store. Google may collect and process data such as the device advertising ID, IP address, device information and ad interactions to serve ads, measure performance and prevent fraud, under the <a href="https://policies.google.com/privacy">Google Privacy Policy</a> and <a href="https://policies.google.com/technologies/partner-sites">how Google uses information from partner apps</a>. You can reset or delete your advertising ID, or opt out of personalised ads, in Settings &gt; Privacy &gt; Ads on your Android device. Users in regions that require it (such as the EEA and UK) are asked for consent before personalised ads are shown. Valoid Pro subscribers see no ads.</p>
-<p><strong>Notifications.</strong> If you allow notifications, Valoid checks your store periodically on your device and notifies you when a favourite skin appears.</p>
-<p><strong>Security.</strong> All connections use HTTPS. Firestore security rules restrict your data to your account.</p>
-<p><strong>Retention and deletion.</strong> Data is kept while your Valoid account is active. You can delete your account and all its data at any time in the app (Settings &gt; Delete account) or through the <a href="/valoid/hapus-akun/">account deletion page</a>. Disconnecting a Riot account in the app removes its session cookies from your device.</p>
-<p><strong>Children.</strong> Valoid is intended for users aged 13 and over. We do not knowingly collect personal data from children.</p>
+<p>Valoid Hub (<code>com.valoid.mobile</code>) is a third-party VALORANT companion app for finding parties. Valoid Hub isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties.</p>
+<p><strong>Account.</strong> You sign in with Google or email and password through Firebase Authentication (Google). We receive your email address, display name and Firebase user ID; passwords are handled by Firebase.</p>
+<p><strong>Riot account.</strong> You connect a Riot account through Riot's official sign-in page; we never see your Riot password. Riot session cookies are stored encrypted on your device only. Riot access tokens are kept in memory and used to request your game data directly from Riot.</p>
+<p><strong>Chat and party finding.</strong> Chat requires a connected Riot account. Your chat profile (Riot ID, rank and rank icon, server region, player card image) and your messages (text, party posts, time) are stored on our servers and are <strong>visible to other signed-in users</strong>. While the app is open, your user ID and connection time are recorded in Firebase Realtime Database (Singapore) to count online users; this is removed automatically when you close the app or disconnect. Reports you send (reported message, reason, details, reporter ID) are readable only by admins. Your block list is private to you. Admins may delete messages and ban users under the <a href="/valoid/aturan-komunitas/">community rules</a>.</p>
+<p><strong>Other data on our servers.</strong> Cloud Firestore (Jakarta region) stores your favourite skins and store history, readable only by you. We do not sell your data or share it with anyone other than the service providers named here.</p>
+<p><strong>Data on your device.</strong> Settings, community-rules consent, app-lock state, caches and the list of connected Riot accounts stay on your device.</p>
+<p><strong>Third-party services.</strong> Riot Games, Google Firebase (Authentication, Cloud Firestore, Realtime Database), valorant-api.com, Google Play Billing and Google AdMob, each under its own privacy policy.</p>
+<p><strong>Ads.</strong> Free users watch a rewarded Google AdMob ad to open the daily store. Google may process the advertising ID, IP address, device information and ad interactions to serve and measure ads and prevent fraud. You can reset your advertising ID or opt out of personalised ads in Android settings. Valoid Pro subscribers see no ads.</p>
+<p><strong>Retention and deletion.</strong> Chat messages are kept until you or an admin delete them or your account is deleted; other data is kept while your account is active. You can delete your own messages, and delete your account and all its data in the app (Settings &gt; Delete account) or via the <a href="/valoid/hapus-akun/">account deletion page</a>. Reports under review may be kept until resolved.</p>
+<p><strong>Children.</strong> Valoid Hub is intended for users aged 13 and over.</p>
 <p><strong>Changes.</strong> This policy may be updated; the latest version is always on this page.</p>
 </div>
