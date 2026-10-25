@@ -1,0 +1,31 @@
+{
+  "name": "Valoid",
+  "kind": "app",
+  "order": 2,
+  "status": "testing",
+  "package": "com.valoid.mobile",
+  "play_url": "",
+  "tagline": "Pendamping VALORANT: toko harian, Night Market, profil, riwayat match, dan kontrak dalam satu aplikasi.",
+  "genre": "Aplikasi pendamping game",
+  "platform": "Android 7.0+",
+  "accent": "#FFD23F",
+  "accent_2": "#A78BFA",
+  "description": [
+    "Valoid membantu pemain VALORANT memantau toko harian, Night Market, bundle, dan saldo tanpa membuka game. Hubungkan akun Riot Anda melalui halaman login resmi Riot, lalu lihat detail skin, profil, rank, riwayat match, kontrak, dan koleksi Anda.",
+    "Valoid adalah aplikasi pihak ketiga dan tidak didukung atau disponsori oleh Riot Games."
+  ],
+  "features": [
+    ["Toko harian & Night Market", "Lihat penawaran harian lengkap dengan hitung mundur, chroma, level, dan video skin."],
+    ["Bundle, aksesori & dompet", "Bundle aktif, toko aksesori, serta saldo VP, Radianite, dan Kingdom Credits."],
+    ["Profil & karier", "Rank, level akun, ringkasan karier per season, dan loadout terpasang."],
+    ["Riwayat match", "Scoreboard, kill feed per ronde, dan matriks duel."],
+    ["Kontrak & misi", "Progres misi harian, mingguan, dan kontrak agen."],
+    ["Valoid Pro", "Favorit skin dengan notifikasi, riwayat toko, dan beberapa akun Riot."]
+  ],
+  "screenshots": [],
+  "privacy": {
+    "effective": "25 Oktober 2026",
+    "account": true,
+    "min_age": 13
+  }
+}

@@ -3,14 +3,15 @@
 
     python3 build.py
 
-Inputs:  site.json, products/<slug>/product.json (+ assets/), static/
-Outputs: dist/index.html, dist/<slug>/index.html, dist/<slug>/privacy/index.html,
+Inputs:  site.json, products/<slug>/product.json (+ assets/, pages/), static/
+Outputs: dist/index.html, dist/<slug>/index.html, dist/<slug>/privacy/index.html, dist/<slug>/<page>/index.html,
          dist/privacy/index.html, dist/app-ads.txt, dist/robots.txt, dist/sitemap.xml, dist/404.html
 """
 import datetime
 import html
 import json
 import os
+import re
 import shutil
 import sys
 
@@ -135,7 +136,35 @@ def home(site, products):
     return page(site, f'{site["name"]} — {site["tagline"]}', site["intro"], body, "/")
 
 
-def product_page(site, p):
+def load_pages(site, p):
+    """Hand-written pages from products/<slug>/pages/<name>.html, served at /<slug>/<name>/.
+
+    Each file is an HTML fragment whose first line is <!-- title: ... -->; {{contact_email}} is replaced.
+    A pages/privacy.html replaces the generated privacy policy.
+    """
+    folder = os.path.join(ROOT, "products", p["slug"], "pages")
+    pages = []
+    if not os.path.isdir(folder):
+        return pages
+    for filename in sorted(os.listdir(folder)):
+        name, ext = os.path.splitext(filename)
+        if ext != ".html":
+            continue
+        with open(os.path.join(folder, filename), encoding="utf-8") as handle:
+            text = handle.read()
+        match = re.match(r"\s*<!--\s*title:\s*(.*?)\s*-->", text)
+        if not match:
+            sys.exit(f"products/{p['slug']}/pages/{filename}: baris pertama harus <!-- title: ... -->")
+        pages.append((name, match.group(1), text[match.end():].replace("{{contact_email}}", esc(site["contact_email"]))))
+    return pages
+
+
+def custom_page(site, p, name, title, body):
+    return page(site, f'{title} — {p["name"]}', f'{title} {p["name"]}.', f'<article class="section narrow legal">{body}</article>',
+                f'/{p["slug"]}/{name}/', p.get("accent"), p.get("accent_2"))
+
+
+def product_page(site, p, pages=()):
     shots = "".join(
         f'<figure><img src="{esc(asset(p, "screenshots/" + name))}" alt="{esc(caption)}" loading="lazy" width="1280" height="720"><figcaption>{esc(caption)}</figcaption></figure>'
         for name, caption in p.get("screenshots", []))
@@ -144,6 +173,13 @@ def product_page(site, p):
     feature_img = ""
     if os.path.isfile(os.path.join(ROOT, "products", p["slug"], "assets", "feature.webp")):
         feature_img = f'<img class="feature" src="{esc(asset(p, "feature.webp"))}" alt="{esc(p["name"])}" width="1024" height="500">'
+    extra_links = "".join(f'<a class="btn ghost" href="/{esc(p["slug"])}/{esc(name)}/">{esc(title)}</a>'
+                          for name, title, _ in pages if name != "privacy")
+    shots_html = f'''
+<section class="section">
+  <h2>Tangkapan layar</h2>
+  <div class="shots">{shots}</div>
+</section>''' if shots else ""
     facts = [("Jenis", p.get("genre", KIND_LABEL.get(p["kind"], ""))), ("Platform", p.get("platform", "Android")), ("Paket", p.get("package", ""))]
     facts_html = "".join(f"<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>" for k, v in facts if v)
     body = f"""
@@ -155,7 +191,7 @@ def product_page(site, p):
       <p class="kicker">{esc(KIND_LABEL.get(p["kind"], p["kind"]))}</p>
       <h1>{esc(p["name"])}</h1>
       <p class="lead">{esc(p["tagline"])}</p>
-      <div class="actions">{play_button(p)}<a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a></div>
+      <div class="actions">{play_button(p)}<a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a>{extra_links}</div>
     </div>
   </div>
 </section>
@@ -164,10 +200,7 @@ def product_page(site, p):
   <h2>Fitur</h2>
   <ul class="features">{features}</ul>
 </section>
-<section class="section">
-  <h2>Tangkapan layar</h2>
-  <div class="shots">{shots}</div>
-</section>
+{shots_html}
 <section class="section narrow">
   <dl class="facts">{facts_html}</dl>
   <p>Bantuan dan laporan bug: <a href="mailto:{esc(site["contact_email"])}?subject={esc(p["name"])}">{esc(site["contact_email"])}</a></p>
@@ -257,9 +290,15 @@ def main():
         assets = os.path.join(ROOT, "products", p["slug"], "assets")
         if os.path.isdir(assets):
             shutil.copytree(assets, os.path.join(DIST, p["slug"], "assets"))
-        write(f'{p["slug"]}/index.html', product_page(site, p))
-        write(f'{p["slug"]}/privacy/index.html', privacy_page(site, p))
-        urls += [f'/{p["slug"]}/', f'/{p["slug"]}/privacy/']
+        pages = load_pages(site, p)
+        write(f'{p["slug"]}/index.html', product_page(site, p, pages))
+        urls.append(f'/{p["slug"]}/')
+        if not any(name == "privacy" for name, _, _ in pages):
+            write(f'{p["slug"]}/privacy/index.html', privacy_page(site, p))
+            urls.append(f'/{p["slug"]}/privacy/')
+        for name, title, body in pages:
+            write(f'{p["slug"]}/{name}/index.html', custom_page(site, p, name, title, body))
+            urls.append(f'/{p["slug"]}/{name}/')
     write("app-ads.txt", "\n".join(site.get("app_ads_txt", [])) + "\n")
     base = site["base_url"].rstrip("/")
     write("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n")

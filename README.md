@@ -24,6 +24,7 @@ URL yang dihasilkan:
 | `/` | beranda + kartu semua produk |
 | `/<slug>/` | halaman produk (feature graphic, fitur, screenshot, tombol Google Play) |
 | `/<slug>/privacy/` | kebijakan privasi produk (ID + EN), dibuat dari blok `privacy` |
+| `/<slug>/<nama>/` | halaman tulisan tangan dari `products/<slug>/pages/<nama>.html` (mis. `hapus-akun`) |
 | `/privacy/` | daftar kebijakan privasi |
 | `/app-ads.txt` | dari `site.json` → `app_ads_txt` |
 | `/robots.txt`, `/sitemap.xml`, `/404.html` | otomatis |
@@ -46,7 +47,9 @@ Field `privacy`:
 - `local_save`: data apa yang disimpan di perangkat.
 - `min_age`: usia minimum target pengguna.
 
-Kalau app mengumpulkan data lain (login, analitik, pembelian), tulis kebijakannya secara khusus — jangan andalkan templat.
+Kalau app mengumpulkan data lain (login, analitik, pembelian), tulis kebijakannya secara khusus — jangan andalkan templat: buat `products/<slug>/pages/privacy.html`, yang menggantikan kebijakan dari templat (contoh: `products/valoid/`).
+
+Halaman di `pages/` berupa potongan HTML; baris pertamanya `<!-- title: Judul -->`, dan `{{contact_email}}` diganti email kontak. Selain `privacy`, setiap halaman juga ditautkan dari halaman produk.
 
 ## Menjalankan
 
