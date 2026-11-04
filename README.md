@@ -37,7 +37,7 @@ python3 new_product.py nama-app "Nama App" game   # atau app
 python3 build.py
 ```
 
-Gambar sebaiknya WebP (screenshot ±80% kualitas). Ikon tetap PNG 512×512 (sama dengan ikon Play Store).
+Gambar sebaiknya WebP (screenshot ±80% kualitas). Screenshot HP (portrait, 720×1280): tambahkan `"screenshot_orientation": "portrait"` di product.json. Ikon tetap PNG 512×512 (sama dengan ikon Play Store).
 
 Saat app sudah tayang: isi `"play_url"` dengan link Play Store dan ubah `"status"` ke `"live"` (pilihan lain: `"coming_soon"`, `"testing"`). Kalau app memakai AdMob dengan akun yang sama, `app-ads.txt` tidak perlu diubah; untuk jaringan iklan lain tambahkan barisnya di `site.json`.
 

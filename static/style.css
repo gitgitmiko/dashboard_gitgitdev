@@ -158,6 +158,10 @@ a.btn.store:hover::before { opacity: .7; }
 .shots figure { margin: 0; flex: 0 0 min(560px, 85%); scroll-snap-align: start; }
 .shots img { border-radius: 16px; border: 1px solid var(--line); }
 .shots figcaption { font-size: .85rem; color: var(--muted); margin-top: 8px; }
+.shots.portrait { gap: 18px; padding-bottom: 16px; }
+.shots.portrait figure { flex: 0 0 min(250px, 64%); }
+.shots.portrait img { border-radius: 26px; border: 1px solid var(--line-strong); box-shadow: 0 18px 50px rgba(0, 0, 0, .45); }
+.shots.portrait figcaption { display: none; } /* the caption is already printed on the Play Store screenshot; it stays as alt text */
 
 /* Facts */
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0 0 20px; }

@@ -41,10 +41,36 @@
       "Rank, karier, scoreboard, kontrak, misi, dan loadout."
     ]
   ],
-  "screenshots": [],
+  "screenshots": [
+    [
+      "01.webp",
+      "Satu tempat untuk cari party"
+    ],
+    [
+      "02.webp",
+      "Room sesuai rank dan wilayah"
+    ],
+    [
+      "03.webp",
+      "Kartu Cari party: Duo, Trio, atau Full 5"
+    ],
+    [
+      "04.webp",
+      "Toko harian dan Night Market"
+    ],
+    [
+      "05.webp",
+      "Profil dan rank"
+    ],
+    [
+      "06.webp",
+      "Riwayat match dan skor K/D/A"
+    ]
+  ],
   "privacy": {
     "effective": "25 Oktober 2026",
     "account": true,
     "min_age": 13
-  }
+  },
+  "screenshot_orientation": "portrait"
 }

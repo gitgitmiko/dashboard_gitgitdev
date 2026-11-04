@@ -208,8 +208,10 @@ def legal_wrap(p, body):
 
 
 def product_page(site, p, pages=()):
+    portrait = p.get("screenshot_orientation") == "portrait"
+    width, height = (720, 1280) if portrait else (1280, 720)
     shots = "".join(
-        f'<figure><img src="{esc(asset(p, "screenshots/" + name))}" alt="{esc(caption)}" loading="lazy" width="1280" height="720"><figcaption>{esc(caption)}</figcaption></figure>'
+        f'<figure><img src="{esc(asset(p, "screenshots/" + name))}" alt="{esc(caption)}" loading="lazy" width="{width}" height="{height}"><figcaption>{esc(caption)}</figcaption></figure>'
         for name, caption in p.get("screenshots", []))
     features = "".join(f'<li><span class="num">{i:02d}</span><strong>{esc(title)}</strong><span>{esc(text)}</span></li>'
                        for i, (title, text) in enumerate(p.get("features", []), 1))
@@ -223,7 +225,7 @@ def product_page(site, p, pages=()):
 <section class="section">
   <p class="eyebrow">Galeri</p>
   <h2>Tangkapan layar</h2>
-  <div class="shots">{shots}</div>
+  <div class="shots{' portrait' if portrait else ''}" tabindex="0" aria-label="Tangkapan layar, geser ke samping">{shots}</div>
 </section>''' if shots else ""
     facts = [("Jenis", p.get("genre", KIND_LABEL.get(p["kind"], ""))), ("Platform", p.get("platform", "Android")), ("Paket", p.get("package", ""))]
     facts_html = "".join(f"<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>" for k, v in facts if v)
