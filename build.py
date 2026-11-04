@@ -79,6 +79,8 @@ def nav_link(href, label, active):
 
 
 def page(site, title, description, body, path, theme=None, image=None, active=None):
+    # <!--email_off--> stops Cloudflare Email Obfuscation: it rewrites addresses to "[email protected]" and needs
+    # a script to decode them, which the site's CSP (no scripts) blocks, so mailto: links would break.
     url = site["base_url"].rstrip("/") + path
     og_image = f'<meta property="og:image" content="{esc(site["base_url"].rstrip("/") + (image or "/static/og-image.jpg"))}">'
     year = datetime.date.today().year
@@ -104,6 +106,7 @@ def page(site, title, description, body, path, theme=None, image=None, active=No
 <link rel="stylesheet" href="/static/theme.css?v={site["_css_version"]}">
 </head>
 <body class="{esc("theme-" + theme) if theme else ""}">
+<!--email_off-->
 <a class="skip" href="#main">Lewati ke konten</a>
 <header class="top">
   <div class="top-inner">
@@ -119,6 +122,7 @@ def page(site, title, description, body, path, theme=None, image=None, active=No
   <p>&copy; {year} {esc(site["name"])} &middot; {esc(site["developer"])} &middot; <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a></p>
   <p class="small">Google Play dan logo Google Play adalah merek dagang Google LLC.</p>
 </footer>
+<!--/email_off-->
 </body>
 </html>
 """
