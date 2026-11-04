@@ -175,7 +175,7 @@ a.btn.store:hover::before { opacity: .7; }
 .facts dd { margin: 2px 0 0; font-weight: 600; word-break: break-word; }
 .panel .actions { margin-bottom: 20px; }
 .panel .actions:last-child { margin-bottom: 0; }
-.email { font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 700; margin: 0 0 20px; word-break: break-all; user-select: all; color: var(--accent); }
+.email { font-size: clamp(1.1rem, 3vw, 1.4rem); font-weight: 700; margin: 0; word-break: break-all; }
 
 /* Legal / hand-written pages */
 .crumbs { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 28px; font-size: .88rem; color: var(--faint); max-width: 780px; margin: 0 auto; }

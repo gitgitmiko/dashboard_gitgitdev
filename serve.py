@@ -100,7 +100,8 @@ class Handler(SimpleHTTPRequestHandler):
 
     def end_headers(self):
         cacheable = "/assets/" in self.path or self.path.startswith("/static/")
-        self.send_header("Cache-Control", "public, max-age=86400" if cacheable else "public, max-age=300")
+        # Pages always revalidate so a fix shows up at once; images and versioned CSS keep a day of cache.
+        self.send_header("Cache-Control", "public, max-age=86400" if cacheable else "no-cache")
         for name, value in SECURITY_HEADERS.items():
             self.send_header(name, value)
         super().end_headers()

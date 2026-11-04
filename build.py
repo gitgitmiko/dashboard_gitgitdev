@@ -128,12 +128,9 @@ def page(site, title, description, body, path, theme=None, image=None, active=No
 """
 
 
-def contact_buttons(site, subject=""):
-    """mailto: only works with an email app installed, so also offer Gmail on the web."""
+def email_link(site, subject=""):
     query = "?subject=" + urllib.parse.quote(subject) if subject else ""
-    gmail = "https://mail.google.com/mail/?" + urllib.parse.urlencode({"view": "cm", "to": site["contact_email"], **({"su": subject} if subject else {})})
-    return (f'<a class="btn" href="mailto:{esc(site["contact_email"])}{esc(query)}">Buka aplikasi email</a>'
-            f'<a class="btn ghost" href="{esc(gmail)}" target="_blank" rel="noopener noreferrer">Tulis lewat Gmail</a>')
+    return f'<a href="mailto:{esc(site["contact_email"])}{esc(query)}">{esc(site["contact_email"])}</a>'
 
 
 def play_button(product):
@@ -184,8 +181,7 @@ def home(site, products):
 <section id="kontak" class="section narrow panel">
   <h2>Kontak</h2>
   <p>Pertanyaan, laporan bug, atau kerja sama, kirim email ke:</p>
-  <p class="email">{esc(site["contact_email"])}</p>
-  <div class="actions">{contact_buttons(site)}</div>
+  <p class="email">{email_link(site)}</p>
 </section>"""
     return page(site, f'{site["name"]} — {site["tagline"]}', site["intro"], body, "/", active="home")
 
@@ -266,8 +262,7 @@ def product_page(site, p, pages=()):
   <h2>Info aplikasi</h2>
   <dl class="facts">{facts_html}</dl>
   <div class="actions"><a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a>{extra_links}</div>
-  <p>Bantuan dan laporan bug: <strong>{esc(site["contact_email"])}</strong></p>
-  <div class="actions">{contact_buttons(site, p["name"])}</div>
+  <p>Bantuan dan laporan bug: {email_link(site, p["name"])}</p>
 </section>"""
     image = asset(p, "feature.webp") if feature_img else None
     return page(site, f'{p["name"]} — {site["name"]}', p["tagline"], body, f'/{p["slug"]}/',
