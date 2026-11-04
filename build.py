@@ -15,6 +15,7 @@ import os
 import re
 import shutil
 import sys
+import urllib.parse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, "dist")
@@ -79,7 +80,7 @@ def nav_link(href, label, active):
 
 def page(site, title, description, body, path, theme=None, image=None, active=None):
     url = site["base_url"].rstrip("/") + path
-    og_image = f'<meta property="og:image" content="{esc(site["base_url"].rstrip("/") + image)}">' if image else ""
+    og_image = f'<meta property="og:image" content="{esc(site["base_url"].rstrip("/") + (image or "/static/og-image.jpg"))}">'
     year = datetime.date.today().year
     return f"""<!doctype html>
 <html lang="id">
@@ -94,7 +95,9 @@ def page(site, title, description, body, path, theme=None, image=None, active=No
 <meta property="og:url" content="{esc(url)}">
 <meta property="og:type" content="website">
 {og_image}
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/static/favicon.ico" sizes="48x48">
+<link rel="icon" href="/static/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
 <meta name="theme-color" content="#0e0f12">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <link rel="stylesheet" href="/static/style.css?v={site["_css_version"]}">
@@ -104,21 +107,29 @@ def page(site, title, description, body, path, theme=None, image=None, active=No
 <a class="skip" href="#main">Lewati ke konten</a>
 <header class="top">
   <div class="top-inner">
-    <a class="brand" href="/"><img src="/static/favicon.svg" alt="" width="30" height="30"><span>{esc(site["name"])}</span></a>
-    <nav class="pills" aria-label="Navigasi utama">{nav_link("/", "Beranda", active == "home")}{nav_link("/#produk", "Produk", active == "product")}{nav_link("/privacy/", "Privasi", active == "privacy")}<a href="mailto:{esc(site["contact_email"])}">Kontak</a></nav>
+    <a class="brand" href="/"><img src="/static/logo-mark.png" alt="" width="34" height="34"><span>{esc(site["name"])}</span></a>
+    <nav class="pills" aria-label="Navigasi utama">{nav_link("/", "Beranda", active == "home")}{nav_link("/#produk", "Produk", active == "product")}{nav_link("/privacy/", "Privasi", active == "privacy")}{nav_link("/#kontak", "Kontak", False)}</nav>
   </div>
 </header>
 <main id="main">
 {body}
 </main>
 <footer class="foot">
-  <a class="brand" href="/"><img src="/static/favicon.svg" alt="" width="24" height="24" loading="lazy"><span>{esc(site["name"])}</span></a>
+  <a class="brand" href="/"><img src="/static/logo-mark.png" alt="" width="28" height="28" loading="lazy"><span>{esc(site["name"])}</span></a>
   <p>&copy; {year} {esc(site["name"])} &middot; {esc(site["developer"])} &middot; <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a></p>
   <p class="small">Google Play dan logo Google Play adalah merek dagang Google LLC.</p>
 </footer>
 </body>
 </html>
 """
+
+
+def contact_buttons(site, subject=""):
+    """mailto: only works with an email app installed, so also offer Gmail on the web."""
+    query = "?subject=" + urllib.parse.quote(subject) if subject else ""
+    gmail = "https://mail.google.com/mail/?" + urllib.parse.urlencode({"view": "cm", "to": site["contact_email"], **({"su": subject} if subject else {})})
+    return (f'<a class="btn" href="mailto:{esc(site["contact_email"])}{esc(query)}">Buka aplikasi email</a>'
+            f'<a class="btn ghost" href="{esc(gmail)}" target="_blank" rel="noopener noreferrer">Tulis lewat Gmail</a>')
 
 
 def play_button(product):
@@ -141,7 +152,7 @@ def asset(product, name):
 def home(site, products):
     cards = []
     for p in products:
-        icon = asset(p, "icon.png") if os.path.isfile(os.path.join(ROOT, "products", p["slug"], "assets", "icon.png")) else "/static/favicon.svg"
+        icon = asset(p, "icon.png") if os.path.isfile(os.path.join(ROOT, "products", p["slug"], "assets", "icon.png")) else "/static/logo-mark.png"
         cards.append(f"""
   <a class="card theme-{esc(p["slug"])}" href="/{esc(p["slug"])}/">
     <img class="icon" src="{esc(icon)}" alt="" width="96" height="96" loading="lazy">
@@ -155,10 +166,10 @@ def home(site, products):
     body = f"""
 <section class="hero">
   <div class="hero-bg" aria-hidden="true"></div>
-  <p class="eyebrow">Studio indie &middot; Indonesia</p>
+  <img class="hero-logo" src="/static/logo-full.webp" alt="{esc(site["name"])}: Indie Game &amp; App Studio" width="1080" height="763">
   <h1>{esc(site["tagline"])}</h1>
   <p class="lead">{esc(site["intro"])}</p>
-  <div class="actions center"><a class="btn" href="#produk">Lihat produk</a><a class="btn ghost" href="mailto:{esc(site["contact_email"])}">Hubungi kami</a></div>
+  <div class="actions center"><a class="btn" href="#produk">Lihat produk</a><a class="btn ghost" href="#kontak">Hubungi kami</a></div>
 </section>
 <section id="produk" class="section">
   <p class="eyebrow">Portofolio</p>
@@ -166,9 +177,11 @@ def home(site, products):
   <div class="cards">{''.join(cards)}
   </div>
 </section>
-<section class="section narrow panel">
+<section id="kontak" class="section narrow panel">
   <h2>Kontak</h2>
-  <p>Pertanyaan, laporan bug, atau kerja sama: <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a>.</p>
+  <p>Pertanyaan, laporan bug, atau kerja sama, kirim email ke:</p>
+  <p class="email">{esc(site["contact_email"])}</p>
+  <div class="actions">{contact_buttons(site)}</div>
 </section>"""
     return page(site, f'{site["name"]} — {site["tagline"]}', site["intro"], body, "/", active="home")
 
@@ -249,7 +262,8 @@ def product_page(site, p, pages=()):
   <h2>Info aplikasi</h2>
   <dl class="facts">{facts_html}</dl>
   <div class="actions"><a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a>{extra_links}</div>
-  <p>Bantuan dan laporan bug: <a href="mailto:{esc(site["contact_email"])}?subject={esc(p["name"])}">{esc(site["contact_email"])}</a></p>
+  <p>Bantuan dan laporan bug: <strong>{esc(site["contact_email"])}</strong></p>
+  <div class="actions">{contact_buttons(site, p["name"])}</div>
 </section>"""
     image = asset(p, "feature.webp") if feature_img else None
     return page(site, f'{p["name"]} — {site["name"]}', p["tagline"], body, f'/{p["slug"]}/',

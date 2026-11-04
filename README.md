@@ -10,7 +10,8 @@ Tanpa dependensi: cukup Python 3 standar.
 site.json                     nama studio, email kontak, baris app-ads.txt, warna
 products/<slug>/product.json  data satu produk (teks, fitur, screenshot, status, privasi)
 products/<slug>/assets/       icon.png (512), feature.webp (1024x500), screenshots/*.webp
-static/                       style.css, favicon.svg
+static/                       style.css, logo (logo-mark.png, logo-full.webp), favicon, og-image.jpg
+brand/                        logo asli resolusi penuh (tidak ikut dipublikasikan)
 build.py                      membuat dist/ dari data di atas
 serve.py                      server statis 127.0.0.1:8796 (www -> domain utama, halaman 404)
 new_product.py                membuat folder produk baru
