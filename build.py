@@ -4,10 +4,11 @@
     python3 build.py
 
 Inputs:  site.json, products/<slug>/product.json (+ assets/, pages/), static/
-Outputs: dist/index.html, dist/<slug>/index.html, dist/<slug>/privacy/index.html, dist/<slug>/<page>/index.html,
+Outputs: dist/static/theme.css, dist/.well-known/security.txt, dist/index.html, dist/<slug>/index.html, dist/<slug>/privacy/index.html, dist/<slug>/<page>/index.html,
          dist/privacy/index.html, dist/app-ads.txt, dist/robots.txt, dist/sitemap.xml, dist/404.html
 """
 import datetime
+import hashlib
 import html
 import json
 import os
@@ -19,6 +20,8 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, "dist")
 KIND_LABEL = {"game": "Game", "app": "Aplikasi"}
 STATUS_LABEL = {"live": "Tersedia di Google Play", "coming_soon": "Segera di Google Play", "testing": "Uji coba tertutup"}
+STATUS_SHORT = {"live": "Tersedia", "coming_soon": "Segera hadir", "testing": "Uji coba tertutup"}
+HEX_COLOR = re.compile(r"#[0-9a-fA-F]{6}")
 
 
 def esc(value):
@@ -42,6 +45,11 @@ def load_products():
         for key in ("name", "kind", "status", "tagline"):
             if not product.get(key):
                 sys.exit(f"products/{slug}/product.json: '{key}' wajib diisi")
+        for key in ("accent", "accent_2"):
+            if key in product and not HEX_COLOR.fullmatch(product[key]):
+                sys.exit(f"products/{slug}/product.json: '{key}' harus warna hex #rrggbb")
+        if product.get("play_url") and not product["play_url"].startswith("https://play.google.com/"):
+            sys.exit(f"products/{slug}/product.json: 'play_url' harus link https://play.google.com/")
         if product.get("hidden"):
             continue
         products.append(product)
@@ -49,9 +57,27 @@ def load_products():
     return products
 
 
-def page(site, title, description, body, path, accent=None, accent_2=None, image=None):
-    accent = accent or site["accent"]
-    accent_2 = accent_2 or site["accent_2"]
+def on_color(hex_color):
+    """Text color that stays readable on top of an accent color."""
+    r, g, b = (int(hex_color[i:i + 2], 16) / 255 for i in (1, 3, 5))
+    return "#111216" if 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.55 else "#ffffff"
+
+
+def theme_css(site, products):
+    """static/theme.css: accent colors per product as classes, so pages need no inline styles (strict CSP)."""
+    rules = []
+    for selector, accent, accent_2 in [(":root", site["accent"], site["accent_2"])] + [
+            (f'.theme-{p["slug"]}', p.get("accent", site["accent"]), p.get("accent_2", site["accent_2"])) for p in products]:
+        rules.append(f"{selector} {{ --accent: {accent}; --accent-2: {accent_2}; --on-accent: {on_color(accent)}; }}")
+    return "\n".join(rules) + "\n"
+
+
+def nav_link(href, label, active):
+    current = ' aria-current="page"' if active else ""
+    return f'<a href="{esc(href)}"{current}>{esc(label)}</a>'
+
+
+def page(site, title, description, body, path, theme=None, image=None, active=None):
     url = site["base_url"].rstrip("/") + path
     og_image = f'<meta property="og:image" content="{esc(site["base_url"].rstrip("/") + image)}">' if image else ""
     year = datetime.date.today().year
@@ -69,18 +95,24 @@ def page(site, title, description, body, path, accent=None, accent_2=None, image
 <meta property="og:type" content="website">
 {og_image}
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/static/style.css">
-<style>:root {{ --accent: {esc(accent)}; --accent-2: {esc(accent_2)}; }}</style>
+<meta name="theme-color" content="#0e0f12">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<link rel="stylesheet" href="/static/style.css?v={site["_css_version"]}">
+<link rel="stylesheet" href="/static/theme.css?v={site["_css_version"]}">
 </head>
-<body>
+<body class="{esc("theme-" + theme) if theme else ""}">
+<a class="skip" href="#main">Lewati ke konten</a>
 <header class="top">
-  <a class="brand" href="/"><span class="logo" aria-hidden="true"></span>{esc(site["name"])}</a>
-  <nav><a href="/#produk">Produk</a><a href="/privacy/">Privasi</a><a href="mailto:{esc(site["contact_email"])}">Kontak</a></nav>
+  <div class="top-inner">
+    <a class="brand" href="/"><img src="/static/favicon.svg" alt="" width="30" height="30"><span>{esc(site["name"])}</span></a>
+    <nav class="pills" aria-label="Navigasi utama">{nav_link("/", "Beranda", active == "home")}{nav_link("/#produk", "Produk", active == "product")}{nav_link("/privacy/", "Privasi", active == "privacy")}<a href="mailto:{esc(site["contact_email"])}">Kontak</a></nav>
+  </div>
 </header>
-<main>
+<main id="main">
 {body}
 </main>
 <footer class="foot">
+  <a class="brand" href="/"><img src="/static/favicon.svg" alt="" width="24" height="24" loading="lazy"><span>{esc(site["name"])}</span></a>
   <p>&copy; {year} {esc(site["name"])} &middot; {esc(site["developer"])} &middot; <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a></p>
   <p class="small">Google Play dan logo Google Play adalah merek dagang Google LLC.</p>
 </footer>
@@ -92,8 +124,9 @@ def page(site, title, description, body, path, accent=None, accent_2=None, image
 def play_button(product):
     label = STATUS_LABEL.get(product["status"], STATUS_LABEL["coming_soon"])
     if product.get("play_url") and product["status"] == "live":
-        return f'<a class="btn play" href="{esc(product["play_url"])}" rel="noopener">{play_icon()}<span>{esc(label)}</span></a>'
-    return f'<span class="btn play disabled">{play_icon()}<span>{esc(label)}</span></span>'
+        return (f'<a class="btn store" href="{esc(product["play_url"])}" rel="noopener noreferrer">{play_icon()}'
+                f'<span><small>Download di</small>Google Play</span></a>')
+    return f'<span class="btn store disabled">{play_icon()}<span><small>Google Play</small>{esc(label)}</span></span>'
 
 
 def play_icon():
@@ -110,30 +143,34 @@ def home(site, products):
     for p in products:
         icon = asset(p, "icon.png") if os.path.isfile(os.path.join(ROOT, "products", p["slug"], "assets", "icon.png")) else "/static/favicon.svg"
         cards.append(f"""
-  <a class="card" href="/{esc(p["slug"])}/" style="--accent:{esc(p.get("accent", site["accent"]))};--accent-2:{esc(p.get("accent_2", site["accent_2"]))}">
+  <a class="card theme-{esc(p["slug"])}" href="/{esc(p["slug"])}/">
     <img class="icon" src="{esc(icon)}" alt="" width="96" height="96" loading="lazy">
     <div>
-      <p class="kicker">{esc(KIND_LABEL.get(p["kind"], p["kind"]))} &middot; {esc(STATUS_LABEL.get(p["status"], ""))}</p>
+      <p class="kicker">{esc(KIND_LABEL.get(p["kind"], p["kind"]))} <span class="dot">&middot;</span> {esc(STATUS_SHORT.get(p["status"], ""))}</p>
       <h3>{esc(p["name"])}</h3>
       <p>{esc(p["tagline"])}</p>
     </div>
+    <span class="arrow" aria-hidden="true">&rarr;</span>
   </a>""")
     body = f"""
 <section class="hero">
+  <div class="hero-bg" aria-hidden="true"></div>
+  <p class="eyebrow">Studio indie &middot; Indonesia</p>
   <h1>{esc(site["tagline"])}</h1>
   <p class="lead">{esc(site["intro"])}</p>
-  <a class="btn" href="#produk">Lihat produk</a>
+  <div class="actions center"><a class="btn" href="#produk">Lihat produk</a><a class="btn ghost" href="mailto:{esc(site["contact_email"])}">Hubungi kami</a></div>
 </section>
 <section id="produk" class="section">
+  <p class="eyebrow">Portofolio</p>
   <h2>Produk</h2>
   <div class="cards">{''.join(cards)}
   </div>
 </section>
-<section class="section narrow">
+<section class="section narrow panel">
   <h2>Kontak</h2>
   <p>Pertanyaan, laporan bug, atau kerja sama: <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a>.</p>
 </section>"""
-    return page(site, f'{site["name"]} — {site["tagline"]}', site["intro"], body, "/")
+    return page(site, f'{site["name"]} — {site["tagline"]}', site["intro"], body, "/", active="home")
 
 
 def load_pages(site, p):
@@ -160,54 +197,61 @@ def load_pages(site, p):
 
 
 def custom_page(site, p, name, title, body):
-    return page(site, f'{title} — {p["name"]}', f'{title} {p["name"]}.', f'<article class="section narrow legal">{body}</article>',
-                f'/{p["slug"]}/{name}/', p.get("accent"), p.get("accent_2"))
+    return page(site, f'{title} — {p["name"]}', f'{title} {p["name"]}.', legal_wrap(p, body),
+                f'/{p["slug"]}/{name}/', p["slug"], active="product")
+
+
+def legal_wrap(p, body):
+    return (f'<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Beranda</a><span aria-hidden="true">/</span>'
+            f'<a href="/{esc(p["slug"])}/">{esc(p["name"])}</a></nav>'
+            f'<article class="section narrow legal">{body}</article>')
 
 
 def product_page(site, p, pages=()):
     shots = "".join(
         f'<figure><img src="{esc(asset(p, "screenshots/" + name))}" alt="{esc(caption)}" loading="lazy" width="1280" height="720"><figcaption>{esc(caption)}</figcaption></figure>'
         for name, caption in p.get("screenshots", []))
-    features = "".join(f"<li><strong>{esc(title)}</strong><span>{esc(text)}</span></li>" for title, text in p.get("features", []))
+    features = "".join(f'<li><span class="num">{i:02d}</span><strong>{esc(title)}</strong><span>{esc(text)}</span></li>'
+                       for i, (title, text) in enumerate(p.get("features", []), 1))
     description = "".join(f"<p>{esc(text)}</p>" for text in p.get("description", []))
     feature_img = ""
     if os.path.isfile(os.path.join(ROOT, "products", p["slug"], "assets", "feature.webp")):
-        feature_img = f'<img class="feature" src="{esc(asset(p, "feature.webp"))}" alt="{esc(p["name"])}" width="1024" height="500">'
+        feature_img = f'<img class="hero-art" src="{esc(asset(p, "feature.webp"))}" alt="" width="1024" height="500">'
     extra_links = "".join(f'<a class="btn ghost" href="/{esc(p["slug"])}/{esc(name)}/">{esc(title)}</a>'
                           for name, title, _ in pages if name != "privacy")
     shots_html = f'''
 <section class="section">
+  <p class="eyebrow">Galeri</p>
   <h2>Tangkapan layar</h2>
   <div class="shots">{shots}</div>
 </section>''' if shots else ""
     facts = [("Jenis", p.get("genre", KIND_LABEL.get(p["kind"], ""))), ("Platform", p.get("platform", "Android")), ("Paket", p.get("package", ""))]
     facts_html = "".join(f"<div><dt>{esc(k)}</dt><dd>{esc(v)}</dd></div>" for k, v in facts if v)
     body = f"""
-<section class="product-hero">
-  {feature_img}
-  <div class="product-head">
-    <img class="icon big" src="{esc(asset(p, "icon.png"))}" alt="" width="128" height="128">
-    <div>
-      <p class="kicker">{esc(KIND_LABEL.get(p["kind"], p["kind"]))}</p>
-      <h1>{esc(p["name"])}</h1>
-      <p class="lead">{esc(p["tagline"])}</p>
-      <div class="actions">{play_button(p)}<a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a>{extra_links}</div>
-    </div>
-  </div>
+<section class="hero product-hero">
+  <div class="hero-bg" aria-hidden="true">{feature_img}</div>
+  <img class="icon big" src="{esc(asset(p, "icon.png"))}" alt="" width="128" height="128">
+  <p class="eyebrow">{esc(KIND_LABEL.get(p["kind"], p["kind"]))} <span class="dot">&middot;</span> {esc(STATUS_SHORT.get(p["status"], ""))}</p>
+  <h1>{esc(p["name"])}</h1>
+  <p class="lead">{esc(p["tagline"])}</p>
+  <div class="actions center">{play_button(p)}<a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a></div>
 </section>
-<section class="section narrow">{description}</section>
+<section class="section narrow about">{description}</section>
 <section class="section">
-  <h2>Fitur</h2>
+  <p class="eyebrow">Fitur</p>
+  <h2>Semua yang ada di {esc(p["name"])}</h2>
   <ul class="features">{features}</ul>
 </section>
 {shots_html}
-<section class="section narrow">
+<section class="section narrow panel">
+  <h2>Info aplikasi</h2>
   <dl class="facts">{facts_html}</dl>
+  <div class="actions"><a class="btn ghost" href="/{esc(p["slug"])}/privacy/">Kebijakan privasi</a>{extra_links}</div>
   <p>Bantuan dan laporan bug: <a href="mailto:{esc(site["contact_email"])}?subject={esc(p["name"])}">{esc(site["contact_email"])}</a></p>
 </section>"""
     image = asset(p, "feature.webp") if feature_img else None
     return page(site, f'{p["name"]} — {site["name"]}', p["tagline"], body, f'/{p["slug"]}/',
-                p.get("accent"), p.get("accent_2"), image)
+                p["slug"], image, active="product")
 
 
 def privacy_page(site, p):
@@ -228,7 +272,6 @@ def privacy_page(site, p):
     account_en = "requires no account, " if not pv.get("account") else ""
     age = int(pv.get("min_age", 13))
     body = f"""
-<article class="section narrow legal">
 <h1>Kebijakan Privasi {name}</h1>
 <p>Berlaku sejak {esc(pv.get("effective", ""))}. Pengembang: {dev} ({esc(site["name"])}). Kontak: <a href="mailto:{email}">{email}</a>.</p>
 <h2>Data yang kami kumpulkan</h2>
@@ -245,10 +288,9 @@ def privacy_page(site, p):
 {ads_en}
 <p><strong>Children.</strong> {name} is intended for users aged {age} and over. We do not knowingly collect personal data from children.</p>
 <p><strong>Changes.</strong> This policy may be updated; the latest version is always on this page.</p>
-</div>
-</article>"""
-    return page(site, f'Kebijakan Privasi — {p["name"]}', f'Kebijakan privasi {p["name"]}.', body,
-                f'/{p["slug"]}/privacy/', p.get("accent"), p.get("accent_2"))
+</div>"""
+    return page(site, f'Kebijakan Privasi — {p["name"]}', f'Kebijakan privasi {p["name"]}.', legal_wrap(p, body),
+                f'/{p["slug"]}/privacy/', p["slug"], active="privacy")
 
 
 def privacy_index(site, products):
@@ -260,12 +302,12 @@ def privacy_index(site, products):
 <ul>{items}</ul>
 <p>Situs ini tidak memakai cookie pelacak atau analitik. Pertanyaan: <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a>.</p>
 </article>"""
-    return page(site, f'Privasi — {site["name"]}', "Kebijakan privasi produk GitgitDev.", body, "/privacy/")
+    return page(site, f'Privasi — {site["name"]}', "Kebijakan privasi produk GitgitDev.", body, "/privacy/", active="privacy")
 
 
 def not_found(site):
     body = """
-<section class="hero"><h1>Halaman tidak ditemukan</h1><p class="lead">Alamat ini tidak ada.</p><a class="btn" href="/">Ke beranda</a></section>"""
+<section class="hero"><div class="hero-bg" aria-hidden="true"></div><p class="eyebrow">404</p><h1>Halaman tidak ditemukan</h1><p class="lead">Alamat ini tidak ada.</p><a class="btn" href="/">Ke beranda</a></section>"""
     return page(site, f'404 — {site["name"]}', "Halaman tidak ditemukan.", body, "/404.html")
 
 
@@ -278,10 +320,18 @@ def write(path, text):
 
 def main():
     site = load_json(os.path.join(ROOT, "site.json"))
+    for key in ("accent", "accent_2"):
+        if not HEX_COLOR.fullmatch(site[key]):
+            sys.exit(f"site.json: '{key}' harus warna hex #rrggbb")
     products = load_products()
+    css = theme_css(site, products)
+    with open(os.path.join(ROOT, "static", "style.css"), "rb") as handle:
+        # Cache-busting query for the stylesheets (they are cached for a day).
+        site["_css_version"] = hashlib.sha256(handle.read() + css.encode()).hexdigest()[:10]
     if os.path.isdir(DIST):
         shutil.rmtree(DIST)
     shutil.copytree(os.path.join(ROOT, "static"), os.path.join(DIST, "static"))
+    write("static/theme.css", css)
     write("index.html", home(site, products))
     write("privacy/index.html", privacy_index(site, products))
     write("404.html", not_found(site))
@@ -301,6 +351,9 @@ def main():
             urls.append(f'/{p["slug"]}/{name}/')
     write("app-ads.txt", "\n".join(site.get("app_ads_txt", [])) + "\n")
     base = site["base_url"].rstrip("/")
+    expires = (datetime.date.today() + datetime.timedelta(days=365)).isoformat()
+    write(".well-known/security.txt", f"Contact: mailto:{site['contact_email']}\nExpires: {expires}T00:00:00Z\n"
+          f"Preferred-Languages: id, en\nCanonical: {base}/.well-known/security.txt\n")
     write("robots.txt", f"User-agent: *\nAllow: /\nSitemap: {base}/sitemap.xml\n")
     write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
           + "".join(f"  <url><loc>{base}{u}</loc></url>\n" for u in urls) + "</urlset>\n")

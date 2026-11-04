@@ -27,7 +27,7 @@ URL yang dihasilkan:
 | `/<slug>/<nama>/` | halaman tulisan tangan dari `products/<slug>/pages/<nama>.html` (mis. `hapus-akun`) |
 | `/privacy/` | daftar kebijakan privasi |
 | `/app-ads.txt` | dari `site.json` → `app_ads_txt` |
-| `/robots.txt`, `/sitemap.xml`, `/404.html` | otomatis |
+| `/robots.txt`, `/sitemap.xml`, `/404.html`, `/.well-known/security.txt` | otomatis |
 
 ## Menambah app/game baru
 
@@ -65,3 +65,9 @@ systemctl --user restart gitgitdev-site   # setelah mengubah konten
 Tunnel Cloudflare (`~/.cloudflared/config.yml`, layanan `cloudflared-webunime`) meneruskan `gitgitdev.my.id` dan `www.gitgitdev.my.id` ke `http://127.0.0.1:8796`. DNS di Cloudflare: CNAME `@` dan `www` → `<id-tunnel>.cfargotunnel.com` (proxied).
 
 Uji lokal: `python3 build.py && python3 serve.py` lalu buka http://127.0.0.1:8796.
+
+## Keamanan
+
+`serve.py` hanya melayani GET/HEAD untuk host `gitgitdev.my.id` (+ `www`, yang dialihkan), menyembunyikan dotfile kecuali `/.well-known/`, dan mengirim header CSP ketat (tanpa skrip, tanpa inline style, tanpa iframe), HSTS, `X-Frame-Options`, `Permissions-Policy`, dan COOP/CORP.
+
+Karena CSP melarang inline style, jangan pakai `style="..."`, `<style>`, atau `<script>` di `pages/*.html`. Warna produk (`accent`, `accent_2`, wajib `#rrggbb`) dibuat oleh `build.py` menjadi `static/theme.css` sebagai kelas `.theme-<slug>`.
