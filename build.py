@@ -119,7 +119,7 @@ def page(site, title, description, body, path, theme=None, image=None, active=No
 </main>
 <footer class="foot">
   <a class="brand" href="/"><img src="/static/logo-mark.png" alt="" width="28" height="28" loading="lazy"><span>{esc(site["name"])}</span></a>
-  <p>&copy; {year} {esc(site["name"])} &middot; {esc(site["developer"])} &middot; <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a></p>
+  <p>&copy; {year} {esc(site["name"])} &middot; <a href="mailto:{esc(site["contact_email"])}">{esc(site["contact_email"])}</a></p>
   <p class="small">Google Play dan logo Google Play adalah merek dagang Google LLC.</p>
 </footer>
 <!--/email_off-->
@@ -273,7 +273,6 @@ def privacy_page(site, p):
     pv = p.get("privacy", {})
     name = esc(p["name"])
     email = esc(site["contact_email"])
-    dev = esc(site["developer"])
     ads_id = ads_en = ""
     if pv.get("ads_admob"):
         moment = pv.get("ads_moment", "di dalam aplikasi")
@@ -288,7 +287,7 @@ def privacy_page(site, p):
     age = int(pv.get("min_age", 13))
     body = f"""
 <h1>Kebijakan Privasi {name}</h1>
-<p>Berlaku sejak {esc(pv.get("effective", ""))}. Pengembang: {dev} ({esc(site["name"])}). Kontak: <a href="mailto:{email}">{email}</a>.</p>
+<p>Berlaku sejak {esc(pv.get("effective", ""))}. Pengembang: {esc(site["name"])}. Kontak: <a href="mailto:{email}">{email}</a>.</p>
 <h2>Data yang kami kumpulkan</h2>
 <p>{name} {account_id}tidak meminta izin lokasi, kamera, mikrofon, kontak, atau penyimpanan, dan tidak mengirim data pribadi ke server kami. {local} hanya disimpan di perangkat Anda dan terhapus jika aplikasi dihapus.</p>
 {ads_id}
@@ -298,7 +297,7 @@ def privacy_page(site, p):
 <p>Kebijakan ini dapat diperbarui. Versi terbaru selalu tersedia di halaman ini.</p>
 <div class="en">
 <h1>{name} Privacy Policy (English)</h1>
-<p>Effective {esc(pv.get("effective", ""))}. Developer: {dev} ({esc(site["name"])}). Contact: <a href="mailto:{email}">{email}</a>.</p>
+<p>Effective {esc(pv.get("effective", ""))}. Developer: {esc(site["name"])}. Contact: <a href="mailto:{email}">{email}</a>.</p>
 <p><strong>Data we collect.</strong> {name} {account_en}asks for no location, camera, microphone, contacts or storage permission, and sends no personal data to our servers. {local_en} is stored only on your device and is removed when the app is uninstalled.</p>
 {ads_en}
 <p><strong>Children.</strong> {name} is intended for users aged {age} and over. We do not knowingly collect personal data from children.</p>
