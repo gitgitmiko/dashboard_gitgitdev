@@ -147,7 +147,13 @@ def play_icon():
 
 
 def asset(product, name):
-    return f"/{product['slug']}/assets/{name}"
+    # ?v=<hash isi file> supaya cache browser/Cloudflare langsung pindah ke gambar baru saat file diganti.
+    path = os.path.join(ROOT, "products", product["slug"], "assets", name)
+    url = f"/{product['slug']}/assets/{name}"
+    if os.path.isfile(path):
+        with open(path, "rb") as handle:
+            url += "?v=" + hashlib.sha256(handle.read()).hexdigest()[:10]
+    return url
 
 
 def home(site, products):
