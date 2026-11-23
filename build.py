@@ -19,9 +19,10 @@ import urllib.parse
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(ROOT, "dist")
-KIND_LABEL = {"game": "Game", "app": "Aplikasi"}
-STATUS_LABEL = {"live": "Tersedia di Google Play", "coming_soon": "Segera di Google Play", "testing": "Uji coba tertutup"}
-STATUS_SHORT = {"live": "Tersedia", "coming_soon": "Segera hadir", "testing": "Uji coba tertutup"}
+KIND_LABEL = {"game": "Game", "app": "Aplikasi", "tool": "Alat web"}
+STATUS_LABEL = {"live": "Tersedia di Google Play", "coming_soon": "Segera di Google Play", "testing": "Uji coba tertutup",
+                "internal": "Alat internal GitgitDev"}
+STATUS_SHORT = {"live": "Tersedia", "coming_soon": "Segera hadir", "testing": "Uji coba tertutup", "internal": "Alat internal"}
 HEX_COLOR = re.compile(r"#[0-9a-fA-F]{6}")
 
 
@@ -135,6 +136,8 @@ def email_link(site, subject=""):
 
 def play_button(product):
     label = STATUS_LABEL.get(product["status"], STATUS_LABEL["coming_soon"])
+    if product["status"] == "internal":  # a web tool, not on Google Play: no store button
+        return f'<span class="btn store disabled"><span><small>Web</small>{esc(label)}</span></span>'
     if product.get("play_url") and product["status"] == "live":
         return (f'<a class="btn store" href="{esc(product["play_url"])}" rel="noopener noreferrer">{play_icon()}'
                 f'<span><small>Download di</small>Google Play</span></a>')
@@ -370,6 +373,8 @@ def main():
             write(f'{p["slug"]}/{name}/index.html', custom_page(site, p, name, title, body))
             urls.append(f'/{p["slug"]}/{name}/')
     write("app-ads.txt", "\n".join(site.get("app_ads_txt", [])) + "\n")
+    # <sub>.gitgitdev.my.id -> product folder, read by serve.py ("subdomain" in product.json)
+    write("subdomains.json", json.dumps({p["subdomain"]: p["slug"] for p in products if p.get("subdomain")}))
     base = site["base_url"].rstrip("/")
     expires = (datetime.date.today() + datetime.timedelta(days=365)).isoformat()
     write(".well-known/security.txt", f"Contact: mailto:{site['contact_email']}\nExpires: {expires}T00:00:00Z\n"

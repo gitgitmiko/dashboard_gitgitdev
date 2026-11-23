@@ -72,5 +72,6 @@
     "account": true,
     "min_age": 13
   },
-  "screenshot_orientation": "portrait"
+  "screenshot_orientation": "portrait",
+  "subdomain": "valoid"
 }

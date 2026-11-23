@@ -16,6 +16,24 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
 DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dist")
 ALLOWED_HOSTS = {"gitgitdev.my.id", "www.gitgitdev.my.id", "localhost", "127.0.0.1"}
+DOMAIN = "gitgitdev.my.id"
+# <sub>.gitgitdev.my.id -> product slug, from "subdomain" in each product.json (build.py writes dist/subdomains.json).
+# On a product's subdomain its pages sit at the root (/, /privacy/, /terms/); the /<slug>/ paths on the main domain
+# keep working, since app stores already link to them.
+_subs = {"mtime": None, "map": {}}
+
+
+def subdomains():
+    f = os.path.join(DIST, "subdomains.json")
+    try:
+        m = os.path.getmtime(f)
+        if m != _subs["mtime"]:
+            import json
+            with open(f) as fh:
+                _subs.update(mtime=m, map=json.load(fh))
+    except (OSError, ValueError):
+        pass
+    return _subs["map"]
 SECURITY_HEADERS = {
     # The site is fully static: own styles and images only, no scripts, no forms, no frames.
     "Content-Security-Policy": "default-src 'none'; img-src 'self'; style-src 'self'; font-src 'self'; manifest-src 'self'; "
@@ -42,11 +60,17 @@ class Handler(SimpleHTTPRequestHandler):
 
     def send_head(self):
         host = (self.headers.get("Host") or "").split(":")[0].lower()
-        if host not in ALLOWED_HOSTS:
+        sub = host[:-len(DOMAIN) - 1] if host.endswith("." + DOMAIN) else ""
+        slug = subdomains().get(sub)
+        if host not in ALLOWED_HOSTS and not slug:
             return self.plain(HTTPStatus.MISDIRECTED_REQUEST, b"Unknown host")
         url_path = urllib.parse.unquote(urllib.parse.urlsplit(self.path).path)
         if not url_path.startswith("/") or "\\" in url_path or "\x00" in url_path:
             return self.plain(HTTPStatus.BAD_REQUEST, b"Bad request")
+        if slug and not url_path.startswith(("/static/", f"/{slug}/")) and url_path not in ("/favicon.ico", "/robots.txt"):
+            # serve the product folder at the subdomain's root
+            url_path = f"/{slug}" + url_path
+            self.path = urllib.parse.quote(url_path, safe="/-._~")
         if host.startswith("www."):
             # Redirect only to our own domain, with a normalised path (no open redirect via //evil.example).
             target = "/" + posixpath.normpath(url_path).lstrip("/")

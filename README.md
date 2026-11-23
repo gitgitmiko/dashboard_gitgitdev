@@ -4,6 +4,16 @@ Situs statis untuk https://gitgitdev.my.id: halaman depan berisi daftar produk, 
 
 Tanpa dependensi: cukup Python 3 standar.
 
+### Subdomain per produk
+
+Isi `"subdomain"` di `product.json` (mis. `"valoid"`) supaya produk juga tampil di `https://<subdomain>.gitgitdev.my.id/`
+dengan halaman-halamannya di root (`/`, `/privacy/`, `/terms/`). `build.py` menulis `dist/subdomains.json` dan `serve.py`
+membacanya; alamat lama `/<slug>/...` di domain utama tetap jalan (sudah dipakai di Play Console). Untuk subdomain baru,
+tambahkan juga hostname-nya di `~/.cloudflared/config.yml` (ke `127.0.0.1:8796`) dan CNAME `<subdomain>` ke tunnel di
+zona gitgitdev.my.id. Sekarang: `studio` (GitGit Studio), `valoid`, `dumplingwitch`.
+
+`"status": "internal"` dengan `"kind": "tool"` untuk alat web yang tidak ada di Google Play (tanpa tombol Play Store).
+
 ## Struktur
 
 ```

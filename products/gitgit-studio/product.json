@@ -1,0 +1,51 @@
+{
+  "name": "GitGit Studio",
+  "kind": "tool",
+  "order": 50,
+  "hidden": false,
+  "status": "internal",
+  "package": "",
+  "play_url": "",
+  "tagline": "Alat otomasi konten GitgitDev: memposting video animasi buatan sendiri ke akun media sosial milik GitgitDev sesuai jadwal.",
+  "genre": "Penjadwal posting video",
+  "platform": "Web (server GitgitDev)",
+  "accent": "#f5a623",
+  "accent_2": "#d22f3a",
+  "description": [
+    "GitGit Studio adalah alat internal GitgitDev untuk menerbitkan video animasi pendek yang kami buat sendiri, seperti serial stickman Kai & Kak Ara, ke akun media sosial milik GitgitDev pada jam yang sudah dijadwalkan.",
+    "Alat ini tidak dijual dan tidak dipakai oleh orang lain. Pemilik akun menghubungkan akunnya sekali lewat login resmi platform (misalnya Login with TikTok), lalu video yang sudah selesai diproduksi diposting otomatis ke akun itu saja."
+  ],
+  "features": [
+    [
+      "Video buatan sendiri",
+      "Hanya memposting animasi orisinal yang diproduksi GitgitDev, lengkap dengan judul dan caption."
+    ],
+    [
+      "Terjadwal",
+      "Video diposting pada jam yang sudah ditentukan untuk tiap akun."
+    ],
+    [
+      "Login resmi",
+      "Akun dihubungkan lewat OAuth resmi platform; kata sandi akun tidak pernah kami terima."
+    ],
+    [
+      "Bisa dicabut kapan saja",
+      "Pemilik akun dapat mencabut izin dari pengaturan platform atau lewat email."
+    ]
+  ],
+  "screenshots": [
+    [
+      "01.webp",
+      "Episode Kai & Kak Ara: Kai berlari masuk"
+    ],
+    [
+      "02.webp",
+      "Close-up saat Kak Ara bicara"
+    ],
+    [
+      "03.webp",
+      "Momen kaget dengan zoom kamera"
+    ]
+  ],
+  "subdomain": "studio"
+}
